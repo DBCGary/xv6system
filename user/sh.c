@@ -99,11 +99,13 @@ runcmd(struct cmd *cmd)
     break;
 
   case PIPE:
-    pcmd = (struct pipecmd*)cmd;
-    if(pipe(p) < 0)
+    pcmd = (struct pipecmd*)cmd;                   //管道前后的命令分别由不同的进程执行，
+                                                   //然后通过管道把两个进程的标准输入输出连接起来，
+                                                   //就实现了管道。
+    if(pipe(p) < 0)                                 //系统调用pipe
       panic("pipe");
-    if(fork1() == 0){
-      close(1);
+    if(fork1() == 0){                               //创建子进程1
+      close(1);                                     //子进程1负责处理管道左端的命令,关闭
       dup(p[1]);
       close(p[0]);
       close(p[1]);
